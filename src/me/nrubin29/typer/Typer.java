@@ -1,6 +1,7 @@
 package me.nrubin29.typer;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,15 +11,13 @@ import java.awt.event.KeyEvent;
 class Typer extends JFrame {
 
     private final JLabel line, time;
-    private final JTextField input;
     private final Timer timer;
+    private String input, lineText;
     private Level currentLevel;
-    private int strokes;
+    private int strokes, index;
 
     private Typer() {
-        super("Typer");
-
-        Font f = new Font(Font.SANS_SERIF, Font.PLAIN, 36);
+        Font f = new Font(Font.SANS_SERIF, Font.PLAIN, 54);
 
         line = new JLabel();
         line.setFont(f);
@@ -26,33 +25,11 @@ class Typer extends JFrame {
         time = new JLabel();
         time.setFont(f);
 
-        input = new JTextField();
-        input.setFont(f);
-        input.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (!timer.isRunning()) timer.start();
-
-                if (input.getText().equals(line.getText())) {
-                    timer.stop();
-                    JOptionPane.showMessageDialog(
-                            Typer.this,
-                            getRoundInformation(),
-                            "Done",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-                    startRound(currentLevel);
-                } else strokes++;
-            }
-        });
-
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BorderLayout());
-        topPanel.add(line, BorderLayout.CENTER);
-        topPanel.add(time, BorderLayout.LINE_END);
-
-        add(topPanel);
-        add(input);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(new EmptyBorder(0, 5, 0, 5));
+        panel.add(line, BorderLayout.LINE_START);
+        panel.add(time, BorderLayout.LINE_END);
+        add(panel);
 
         JMenu level = new JMenu("Level");
         ButtonGroup levelGroup = new ButtonGroup();
@@ -78,8 +55,7 @@ class Typer extends JFrame {
 
         setJMenuBar(bar);
 
-        setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-        setSize(640, 170);
+        setSize(640, 150);
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -92,6 +68,65 @@ class Typer extends JFrame {
             }
         });
 
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if ((input + e.getKeyChar()).equals(lineText)) {
+                    timer.stop();
+
+                    double
+                            t = Integer.valueOf(time.getText()),
+                            acc = ((double) currentLevel.getLength() / strokes) * 100;
+
+                    if (acc > 100) acc = 100;
+
+                    double gradeNum = t / 10 + acc / 10;
+                    char grade;
+
+                    if (gradeNum > 8) grade = 'A';
+                    else if (gradeNum > 6) grade = 'B';
+                    else if (gradeNum > 4) grade = 'C';
+                    else if (gradeNum > 2) grade = 'D';
+                    else grade = 'F';
+
+                    JOptionPane.showMessageDialog(
+                            Typer.this,
+                            "Time: " + new Double(t).intValue() + " seconds. Accuracy: " + new Double(acc).intValue() + "%. Grade: " + grade + ".",
+                            "Done",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+
+                    startRound(currentLevel);
+
+                    e.consume();
+                    return;
+                }
+
+                strokes++;
+
+                if (
+                        e.getKeyChar() != lineText.charAt(index) ||
+                                (!Character.isLetter(e.getKeyChar()) &&
+                                        !Character.isDigit(e.getKeyChar()) &&
+                                        e.getKeyChar() != ' ')
+                        ) {
+                    e.consume();
+                    Toolkit.getDefaultToolkit().beep();
+                    return;
+                } else {
+                    input += e.getKeyChar();
+                    line.setText("<html><font color='gray'>" + lineText.substring(0, ++index) + "<font color='black'>|" + lineText.substring(index) + "<html");
+                }
+
+                if (!timer.isRunning()) timer.start();
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                e.consume();
+            }
+        });
+
         startRound(currentLevel = Level.ONE);
     }
 
@@ -100,28 +135,12 @@ class Typer extends JFrame {
     }
 
     private void startRound(Level l) {
-        input.setText("");
+        setTitle("Level " + l.getName());
+        index = 0;
+        input = "";
         time.setText("0");
-        line.setText(l.getRandomString());
+        lineText = l.getRandomString();
+        line.setText("|" + lineText);
         strokes = 0;
-    }
-
-    private String getRoundInformation() {
-        double
-                t = Integer.valueOf(time.getText()),
-                acc = ((double) currentLevel.getLength() / strokes) * 100;
-
-        if (acc > 100) acc = 100;
-
-        double gradeNum = t / 10 + acc / 10;
-        char grade;
-
-        if (gradeNum > 8) grade = 'A';
-        else if (gradeNum > 6) grade = 'B';
-        else if (gradeNum > 4) grade = 'C';
-        else if (gradeNum > 2) grade = 'D';
-        else grade = 'F';
-
-        return "Time: " + new Double(t).intValue() + " seconds. Accuracy: " + new Double(acc).intValue() + "%. Grade: " + grade + ".";
     }
 }

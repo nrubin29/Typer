@@ -4,7 +4,9 @@ import java.util.Random;
 
 public enum Level {
 
-    ONE("One - f, j", 20, 'f', 'j');
+    ONE("One - f, j", 20, 'f', 'j'),
+    TWO("Two - g, h", 20, 'g', 'h'),
+    THREE("Three - f, g, h, j", 20, 'f', 'g', 'h', 'j');
 
     private static final Random RAND = new Random();
 
