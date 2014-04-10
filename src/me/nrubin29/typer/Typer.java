@@ -55,7 +55,6 @@ class Typer extends JFrame {
 
         setJMenuBar(bar);
 
-        setSize(640, 150);
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -76,9 +75,7 @@ class Typer extends JFrame {
 
                     double
                             t = Integer.valueOf(time.getText()),
-                            acc = ((double) currentLevel.getLength() / strokes) * 100;
-
-                    if (acc > 100) acc = 100;
+                            acc = Utils.fixNumber(((double) currentLevel.getLength() / strokes) * 100, 0, 100);
 
                     double gradeNum = t / 10 + acc / 10;
                     char grade;
@@ -135,12 +132,14 @@ class Typer extends JFrame {
     }
 
     private void startRound(Level l) {
-        setTitle("Level " + l.getName());
         index = 0;
+        strokes = 0;
+        line.setText("|" + (lineText = l.getRandomString()));
         input = "";
         time.setText("0");
-        lineText = l.getRandomString();
-        line.setText("|" + lineText);
-        strokes = 0;
+
+        setTitle("Level " + l.getName());
+        setSize(line.getFontMetrics(line.getFont()).stringWidth(line.getText()) + 80, 150);
+        setLocationRelativeTo(null);
     }
 }

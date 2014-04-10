@@ -1,14 +1,10 @@
 package me.nrubin29.typer;
 
-import java.util.Random;
-
 public enum Level {
 
     ONE("One - f, j", 20, 'f', 'j'),
     TWO("Two - g, h", 20, 'g', 'h'),
     THREE("Three - f, g, h, j", 20, 'f', 'g', 'h', 'j');
-
-    private static final Random RAND = new Random();
 
     private final String name;
     private final int length;
@@ -35,26 +31,31 @@ public enum Level {
     public String getRandomString() {
         StringBuilder str = new StringBuilder();
 
-        boolean lastWasSpace = false;
+        int numChars = Utils.getRandomNumber(getLength() - 2, getLength() + 2);
+        int numSpaces = Utils.getRandomNumber(2, 6);
 
-        for (int i = 0; i < getLength(); i++) {
-            int j = RAND.nextInt(getChars().length + 1);
+        for (int i = 0; i < numChars; i++) {
+            int j = Utils.getRandomNumber(0, getChars().length + 1);
             char c;
 
             if (j == getChars().length) {
-                if (!lastWasSpace) {
-                    c = ' ';
-                    lastWasSpace = true;
-                } else {
-                    c = getChars()[j - 1];
-                    lastWasSpace = false;
-                }
+                c = getChars()[j - 1];
             } else {
                 c = getChars()[j];
-                lastWasSpace = false;
             }
 
             str.append(c);
+        }
+
+        for (int i = 0; i < numSpaces; i++) {
+            int j;
+
+            do {
+                j = Utils.getRandomNumber(0, str.length());
+            }
+            while (str.charAt(Utils.fixNumber(j - 1, 0, str.length() - 1)) == ' ' || str.charAt(Utils.fixNumber(j + 1, 0, str.length() - 1)) == ' ');
+
+            str.insert(j, ' ');
         }
 
         return str.toString().trim();
