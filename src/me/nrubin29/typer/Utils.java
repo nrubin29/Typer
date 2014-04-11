@@ -1,8 +1,12 @@
 package me.nrubin29.typer;
 
+import java.awt.*;
 import java.util.Random;
 
 class Utils {
+
+    public static final Font LARGE_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 54);
+    public static final Font SMALL_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
 
     private static final Random RAND = new Random();
 
