@@ -2,17 +2,32 @@ package me.nrubin29.typer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 class ScorePanel extends JPanel {
 
-    public ScorePanel(Typer typer, int time, int acc, char grade) {
+    private KeyListener keyListener;
+
+    public ScorePanel(final Typer typer, int time, int acc, char grade) {
         add(new LabeledPanel("Time", String.valueOf(time)));
         add(Box.createHorizontalStrut(20));
         add(new LabeledPanel("Accuracy", acc + "%"));
         add(Box.createHorizontalStrut(20));
         add(new LabeledPanel("Grade", String.valueOf(grade)));
+        add(Box.createHorizontalStrut(20));
+        add(new LabeledPanel("Continue", "Enter"));
 
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        typer.addKeyListener(keyListener = new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    typer.startRound();
+                    typer.removeKeyListener(keyListener);
+                }
+            }
+        });
     }
 }
 

@@ -1,9 +1,10 @@
 package me.nrubin29.typer;
 
 import javax.swing.*;
-import java.awt.*;
+import javax.swing.event.MouseInputAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 
 class Typer extends JFrame {
 
@@ -12,6 +13,19 @@ class Typer extends JFrame {
     private Level currentLevel;
 
     private Typer() {
+        JMenu about = new JMenu("About");
+        about.addMouseListener(new MouseInputAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JOptionPane.showMessageDialog(
+                        Typer.this,
+                        "Typer made by Noah Rubin for St. James School with love.",
+                        "About",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        });
+
         JMenu level = new JMenu("Level");
         ButtonGroup levelGroup = new ButtonGroup();
 
@@ -32,6 +46,7 @@ class Typer extends JFrame {
         }
 
         JMenuBar bar = new JMenuBar();
+        bar.add(about);
         bar.add(level);
 
         setJMenuBar(bar);
@@ -53,10 +68,13 @@ class Typer extends JFrame {
         add(currentComponent = new TypingPanel(this, l));
     }
 
+    void startRound() {
+        startRound(currentLevel);
+    }
+
     void endRound(int time, int acc, char grade) {
         if (currentComponent != null) remove(currentComponent);
         add(currentComponent = new ScorePanel(this, time, acc, grade));
-        currentComponent.setAlignmentX(Component.CENTER_ALIGNMENT);
         dispose();
         setVisible(true);
     }

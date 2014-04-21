@@ -3,10 +3,7 @@ package me.nrubin29.typer;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
 class TypingPanel extends JPanel {
 
@@ -15,6 +12,8 @@ class TypingPanel extends JPanel {
     private final String lineText;
     private String input;
     private int strokes, index;
+
+    private KeyListener keyListener;
 
     public TypingPanel(final Typer typer, final Level l) {
         line = new JLabel("|" + (lineText = l.getRandomString()));
@@ -38,7 +37,7 @@ class TypingPanel extends JPanel {
             }
         });
 
-        typer.addKeyListener(new KeyAdapter() {
+        typer.addKeyListener(keyListener = new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
                 if ((input + e.getKeyChar()).equals(lineText)) {
@@ -56,6 +55,8 @@ class TypingPanel extends JPanel {
                     else if (gradeNum > 4) grade = 'C';
                     else if (gradeNum > 2) grade = 'D';
                     else grade = 'F';
+
+                    typer.removeKeyListener(keyListener);
 
                     typer.endRound(new Double(t).intValue(), new Double(accu).intValue(), grade);
 
